@@ -1,8 +1,10 @@
 ﻿using GalaSoft.MvvmLight.Command;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -21,7 +23,6 @@ namespace Ticket.ViewModels
         private User user;
         private DialogService dialogService;
         private ApiService apiService;
-        private NavigationService navigationService;
         private bool isRunning;
         private bool isEnabled;
         private string status;
@@ -98,6 +99,8 @@ namespace Ticket.ViewModels
         public TicketViewModel(User user)
         {
             this.user = user;
+            dialogService = new DialogService();
+            apiService = new ApiService();
             IsEnabled = true;
             Status = "Esperando para leer Ticket";
             Color = "Black";
@@ -105,57 +108,7 @@ namespace Ticket.ViewModels
         #endregion
 
         #region Methods
-        private async void CheckTicketCode()
-        {
-            IsRunning = true;
-            IsEnabled = false;
-            var response = await apiService.GetTicket(
-                "http://checkticketsback.azurewebsites.net",
-                "/api/Tickets/",
-                TicketCode);
-            IsRunning = false;
-            IsEnabled = true;
-
-            if (response.IsSuccess)
-            {
-                Color = "Red";
-                Status = "TICKET YA LEIDO";
-                //Falta validar errores de conexión
-                return;
-            }
-
-            SaveTicket();
-        }
-
-        private async void SaveTicket()
-        {
-            var dateTime = DateTime.Date;
-            var newTicket = new Tickets
-            {
-                TicketCode = TicketCode,
-                DateTime = dateTime,
-                UserId = user.UserId,
-            };
-
-            IsRunning = true;
-            IsEnabled = false;
-            var response = await apiService.Post(
-                "http://checkticketsback.azurewebsites.net",
-                "/api",
-                "/Tickets",
-                newTicket);
-            IsRunning = false;
-            IsEnabled = true;
-
-            if (!response.IsSuccess)
-            {
-                await dialogService.ShowMessage("Error", response.Message);
-                return;
-            }
-
-            Color = "Green";
-            Status = "ACCESO AUTORIZADO";
-        }
+       
         #endregion
 
         #region Commands
@@ -174,11 +127,71 @@ namespace Ticket.ViewModels
 
             if (TicketCode.Length != 4)
             {
-                await dialogService.ShowMessage("Error", "Codigo del Ticket incorrecto.");
+                await dialogService.ShowMessage("Error", "Codigo del Ticket incorrecto");
                 return;
             }
 
-            CheckTicketCode();
+            IsRunning = true;
+            IsEnabled = false;
+
+            //var client = new HttpClient();
+            //client.BaseAddress = new Uri("http://checkticketsback.azurewebsites.net");
+            //var url = string.Format("{0}{1}", "/api/Tickets/", TicketCode);
+            //var response = await client.GetAsync(url);
+
+            var response = await apiService.Get<Tickets>(
+                "http://checkticketsback.azurewebsites.net",
+                "/api/Tickets/",
+                TicketCode);
+
+            IsRunning = false;
+            IsEnabled = true;
+
+            if (response.IsSuccess)
+            {
+                Color = "Red";
+                Status = string.Format("{0} ,{1}", TicketCode,"TICKET YA LEIDO");
+                //Falta validar errores de conexión
+                return;
+            }
+
+            var dateTime = DateTime.Now;
+            var Date = string.Format("{0}-{1}-{2}T{3:00}:{4:00}:{5:00}", dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, dateTime.Second);
+
+            var newTicket = new Tickets
+            {
+                TicketCode = TicketCode,
+                Datetime = Date,
+                UserId = user.UserId,
+            };
+
+            IsRunning = true;
+            IsEnabled = false;
+
+            //var request = JsonConvert.SerializeObject(newTicket);
+            //var content = new StringContent(request, Encoding.UTF8, "application/json");
+            //client = new HttpClient();
+            //client.BaseAddress = new Uri("http://checkticketsback.azurewebsites.net");
+            //url = string.Format("{0}{1}", "/api", "/Tickets");
+            //response = await client.PostAsync(url, content);
+
+            response = await apiService.Post<Tickets>(
+                "http://checkticketsback.azurewebsites.net",
+                "/api",
+                "/Tickets",
+                newTicket);
+
+            IsRunning = false;
+            IsEnabled = true;
+
+            if (!response.IsSuccess)
+            {
+                await dialogService.ShowMessage("Error", response.Message);
+                return;
+            }
+
+            Color = "Green";
+            Status = Status = string.Format("{0} ,{1}", TicketCode, "ACCESO AUTORIZADO");
         }
         #endregion
     }

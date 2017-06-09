@@ -10,7 +10,7 @@ namespace Ticket.Models
     {
         public int TicketId { get; set; }
         public string TicketCode { get; set; }
-        public DateTime DateTime { get; set; }
+        public string Datetime { get; set; }  
         public int UserId { get; set; }
     }
 }

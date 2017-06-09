@@ -11,7 +11,6 @@ namespace Ticket.Services
 {
     public class ApiService
     {
-        private Response res;
         public async Task<Response> Get<T>(string urlBase, string servicePrefix,
                                            string controller)
         {
@@ -33,47 +32,8 @@ namespace Ticket.Services
                 }
 
                 var result = await response.Content.ReadAsStringAsync();
-                var list = JsonConvert.DeserializeObject<List<T>>(result);
+                var list = JsonConvert.DeserializeObject<T>(result);
                 return new Response
-                {
-                    IsSuccess = true,
-                    Message = "Ok",
-                    Result = list,
-                };
-            }
-            catch (Exception ex)
-            {
-                return new Response
-                {
-                    IsSuccess = false,
-                    Message = ex.Message,
-                };
-            }
-        }
-
-        public async Task<Response> GetTicket(string urlBase, string servicePrefix,
-                                           string controller)
-        {
-            try
-            {
-                var client = new HttpClient();
-                client.BaseAddress = new Uri(urlBase);
-                var url = string.Format("{0}{1}", servicePrefix, controller);
-                var response = await client.GetAsync(url);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new Response
-                    {
-                        //TODO: Mejorar el mensaje cuando falle
-                        IsSuccess = false,
-                        Message = response.StatusCode.ToString(),
-                    };
-                }
-
-                var result = await response.Content.ReadAsStringAsync();
-                var list = JsonConvert.DeserializeObject<string>(result);
-                return  new Response
                 {
                     IsSuccess = true,
                     Message = "Ok",

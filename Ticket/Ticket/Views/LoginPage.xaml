@@ -3,12 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Ticket.Views.LoginPage"
              Title="Login"
+             BackgroundColor="LightGreen"
              BindingContext="{Binding Main, Source={StaticResource Locator}}">
     <ContentPage.Content>
         <ScrollView
-            BindingContext="{Binding Login}">
-            <StackLayout>
-                <Label 
+            BindingContext="{Binding Login}"
+            Padding="0,100,0,200">
+            <StackLayout
+                HorizontalOptions="CenterAndExpand">
+                <Label
+                    HorizontalOptions="FillAndExpand"
+                    FontSize="30"
+                    FontFamily="Verdana"
+                    FontAttributes="Bold"
                     Text="Email">
                 </Label>
                 <Entry
@@ -16,7 +23,11 @@
                     Placeholder="Ingresar Email"
                     Keyboard="Email">
                 </Entry>
-                <Label 
+                <Label
+                    HorizontalOptions="FillAndExpand"
+                    FontSize="30"
+                    FontFamily="Verdana"
+                    FontAttributes="Bold"
                     Text="Password">
                 </Label>
                 <Entry
@@ -27,7 +38,15 @@
                 <ActivityIndicator
                     IsRunning="{Binding IsRunning}">
                 </ActivityIndicator>
-                <Button
+                <Image
+                    Source="key.png">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Command="{Binding LoginUserCommand}">
+                         </TapGestureRecognizer>
+                    </Image.GestureRecognizers>
+                </Image>
+                <!--<Button
                     HeightRequest="40"
                     BorderRadius="20"
                     HorizontalOptions="FillAndExpand"
@@ -36,7 +55,7 @@
                     BackgroundColor="Orange"
                     TextColor="White"
                     Text="Login">
-                </Button>
+                </Button>-->
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>

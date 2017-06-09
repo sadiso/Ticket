@@ -3,12 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Ticket.Views.TicketPage"
              Title="Ticket"
+             BackgroundColor="LightGreen"
              BindingContext="{Binding Main, Source={StaticResource Locator}}">
     <ContentPage.Content>
         <ScrollView
             BindingContext="{Binding Ticket}">
-            <StackLayout>
+            <StackLayout
+                HorizontalOptions="CenterAndExpand"
+                Padding="0,100,0,200">
                 <Label 
+                    FontSize="30"
+                    FontFamily="Verdana"
+                    FontAttributes="Bold"
                     Text="Ingresar Ticket">
                 </Label>
                 <Entry
@@ -18,12 +24,22 @@
                 <Label 
                     Text="{Binding Status, Mode=TwoWay}"
                     TextColor="{Binding Color, Mode=TwoWay}"
-                    FontSize="Large">
+                    FontSize="30"
+                    FontFamily="Verdana"
+                    FontAttributes="Bold">
                 </Label>
                 <ActivityIndicator
                     IsRunning="{Binding IsRunning}">
                 </ActivityIndicator>
-                <Button
+                <Image
+                    Source="checklist.png">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Command="{Binding CheckTicketCommand}">
+                        </TapGestureRecognizer>
+                    </Image.GestureRecognizers>
+                </Image>
+                <!--<Button
                     HeightRequest="40"
                     BorderRadius="20"
                     HorizontalOptions="FillAndExpand"
@@ -32,7 +48,7 @@
                     BackgroundColor="Orange"
                     TextColor="White"
                     Text="Consultar">
-                </Button>
+                </Button>-->
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>
